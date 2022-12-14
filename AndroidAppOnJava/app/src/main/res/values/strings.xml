@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Android application on Java</string>
+    <string name="city">Moscow</string>
+    <string name="temperature" translatable="false">-2°</string>
+</resources>
