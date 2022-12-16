@@ -12,6 +12,7 @@
     <string name="wind_speed">Скорость ветра</string>
     <string name="show_weather_button">Показать погоду</string>
     <string name="settings_button">Настройки</string>
+    <string name="show_weather_on_internet">Показать погоду в Интернете</string>
     <string name="night_theme">Ночная тема</string>
     <string name="orientation_portrait">Портретная ориентация</string>
     <string name="orientation_landscape">Книжная ориентация</string>
