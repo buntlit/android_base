@@ -27,7 +27,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".ShowWeatherActivity"
             android:label="@string/app_name">
         </activity>
         <activity

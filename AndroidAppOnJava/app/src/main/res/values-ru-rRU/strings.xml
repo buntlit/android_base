@@ -4,8 +4,6 @@
     <string name="choosing_city_name">Выбор города</string>
     <string name="settings">Настройки</string>
     <string name="city1">Москва</string>
-    <string name="city2">Санкт-Петербург</string>
-    <string name="city3">Екатеринбург</string>
     <string name="enter_city">Введите город</string>
     <string name="humidity">Влажность</string>
     <string name="pressure">Давление</string>

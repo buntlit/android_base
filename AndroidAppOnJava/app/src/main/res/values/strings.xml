@@ -3,8 +3,6 @@
     <string name="choosing_city_name">Choose city</string>
     <string name="settings">Settings</string>
     <string name="city1">Moscow</string>
-    <string name="city2">Saint-Petersburg</string>
-    <string name="city3">Yekaterinburg</string>
     <string name="enter_city">Enter city</string>
     <string name="temperature" translatable="false">-2°</string>
     <string name="humidity">Humidity</string>
