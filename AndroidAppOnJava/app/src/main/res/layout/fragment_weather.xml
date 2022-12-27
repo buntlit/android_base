@@ -117,12 +117,20 @@
             app:layout_constraintTop_toBottomOf="@+id/pressureValue" />
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewForecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/windSpeedLinear" />
+
     <Button
         android:id="@+id/showWeatherOnInternet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/show_weather_on_internet"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/windSpeedLinear" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewForecast" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,8 +13,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ShowWeatherFragment extends Fragment {
     public static final String PARCEL = "PARCEL";
@@ -39,7 +44,8 @@ public class ShowWeatherFragment extends Fragment {
         if (savedParcel instanceof Parcel) {
             return (Parcel) savedParcel;
         } else {
-            return new Parcel(getResources().getStringArray(R.array.cities)[0], 0);
+            List<String> cities = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.cities)));
+            return new Parcel(cities.get(0), 0, cities);
         }
     }
 
@@ -68,8 +74,19 @@ public class ShowWeatherFragment extends Fragment {
         String[] windSpeedArray = getResources().getStringArray(R.array.windSpeed);
 
         Parcel parcel = getParcel();
-        int index = parcel.getCityIndex();
+        int index;
+        if (parcel.getCityIndex() > getResources().getStringArray(R.array.cities).length) {
+            index = getResources().getStringArray(R.array.cities).length;
+        } else {
+            index = parcel.getCityIndex();
+        }
         city.setText(parcel.getCityName());
+
+        final RecyclerView recyclerView = view.findViewById(R.id.recyclerViewForecast);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ForecastAdapter forecastAdapter = new ForecastAdapter(Arrays.asList(getResources().getStringArray(R.array.days)), index, getContext());
+        recyclerView.setAdapter(forecastAdapter);
+
         temperatureValue.setText(temperaturesArray[index]);
         humidityValue.setText(humidityArray[index]);
         pressureValue.setText(pressureArray[index]);

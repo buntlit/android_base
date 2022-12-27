@@ -12,20 +12,23 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChoosingCityFragment extends Fragment {
 
     final String CURRENT_CITY = "CURRENT_CITY";
-    final int DEFAULT_INDEX = 5;
+    final String LIST = "LIST";
 
     static ChooseCityPresenter presenter = ChooseCityPresenter.getInstance();
 
@@ -35,6 +38,8 @@ public class ChoosingCityFragment extends Fragment {
     CheckBox checkBoxHumidity;
     CheckBox checkBoxPressure;
     CheckBox checkBoxWindSpeed;
+    final CitiesAdapter adapter = new CitiesAdapter();
+    List<String> cities;
 
 
     @Override
@@ -45,6 +50,11 @@ public class ChoosingCityFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState == null) {
+            cities = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.cities)));
+        } else {
+            cities = savedInstanceState.getStringArrayList(LIST);
+        }
         initList(view);
         enterCity = view.findViewById(R.id.enterCity);
         checkBoxHumidity = view.findViewById(R.id.checkBoxHumidity);
@@ -53,7 +63,7 @@ public class ChoosingCityFragment extends Fragment {
         checkBoxHumidity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-               showExtras();
+                showExtras();
             }
         });
         checkBoxPressure.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -74,8 +84,18 @@ public class ChoosingCityFragment extends Fragment {
         showWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Parcel enterParcel = new Parcel(enterCity.getText().toString(), DEFAULT_INDEX);
-                showWeather(enterParcel);
+                String text = enterCity.getText().toString();
+                if (!text.equals("")) {
+                    if (!cities.contains(text)) {
+                        cities.add(cities.size(), text);
+                        adapter.setCities(cities);
+                        currentParcel.setCities(cities);
+                        adapter.notifyItemInserted(cities.size() - 1);
+
+                    }
+                    Parcel enterParcel = new Parcel(text, cities.size() - 1, cities);
+                    showWeather(enterParcel);
+                }
             }
         });
     }
@@ -85,7 +105,6 @@ public class ChoosingCityFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        currentParcel = new Parcel(getResources().getStringArray(R.array.cities)[0], 0);
         isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         if (savedInstanceState != null) {
@@ -93,6 +112,8 @@ public class ChoosingCityFragment extends Fragment {
             if (savedParcel instanceof Parcel) {
                 currentParcel = (Parcel) savedParcel;
             }
+        } else {
+            currentParcel = new Parcel(cities.get(0), 0, cities);
         }
         if (isLandscape) {
             showWeather(currentParcel);
@@ -102,6 +123,7 @@ public class ChoosingCityFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putSerializable(CURRENT_CITY, currentParcel);
+        outState.putStringArrayList(LIST, (ArrayList<String>) cities);
         super.onSaveInstanceState(outState);
     }
 
@@ -118,23 +140,17 @@ public class ChoosingCityFragment extends Fragment {
     }
 
     private void initList(View view) {
-        LinearLayout linearLayout = view.findViewById(R.id.linearLayout);
-        String[] cities = getResources().getStringArray(R.array.cities);
-
-        for (int i = 0; i < cities.length; i++) {
-            TextView textView = new TextView(getContext());
-            textView.setText(cities[i]);
-            textView.setTextSize(20);
-            linearLayout.addView(textView);
-            final int index = i;
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    currentParcel = new Parcel(getResources().getStringArray(R.array.cities)[index], index);
-                    showWeather(currentParcel);
-                }
-            });
-        }
+        final RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCityList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter.setCities(cities);
+        recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new CitiesAdapter.OnItemClickListener() {
+            @Override
+            public void onCityTextClick(View view, int position) {
+                currentParcel = new Parcel(cities.get(position), position, cities);
+                showWeather(currentParcel);
+            }
+        });
     }
 
     private void showWeather(Parcel currentParcel) {
