@@ -12,18 +12,25 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ChoosingCityFragment extends Fragment {
 
@@ -34,17 +41,18 @@ public class ChoosingCityFragment extends Fragment {
 
     boolean isLandscape;
     Parcel currentParcel;
-    EditText enterCity;
+    TextInputEditText enterCity;
     CheckBox checkBoxHumidity;
     CheckBox checkBoxPressure;
     CheckBox checkBoxWindSpeed;
     final CitiesAdapter adapter = new CitiesAdapter();
     List<String> cities;
+    Pattern checkCity = Pattern.compile("^[A-ZА-Я][a-zа-я]{2,}$");
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_choose_city, container, false);
+       return inflater.inflate(R.layout.fragment_choose_city, container, false);
     }
 
     @Override
@@ -63,19 +71,31 @@ public class ChoosingCityFragment extends Fragment {
         checkBoxHumidity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                showExtras();
+                showExtras(compoundButton, b);
             }
         });
         checkBoxPressure.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                showExtras();
+                showExtras(compoundButton, b);
             }
         });
         checkBoxWindSpeed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                showExtras();
+                showExtras(compoundButton, b);
+            }
+        });
+
+        enterCity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    return;
+                }
+                TextView textView = (TextView) view;
+                String text = textView.getText().toString();
+                checkEnterCity(textView, text);
             }
         });
 
@@ -85,7 +105,7 @@ public class ChoosingCityFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String text = enterCity.getText().toString();
-                if (!text.equals("")) {
+                if (checkEnterCity(enterCity, text)) {
                     if (!cities.contains(text)) {
                         cities.add(cities.size(), text);
                         adapter.setCities(cities);
@@ -137,6 +157,7 @@ public class ChoosingCityFragment extends Fragment {
     public void onResume() {
         super.onResume();
         restoreInstance(enterCity, checkBoxHumidity, checkBoxPressure, checkBoxWindSpeed);
+        changeTheme();
     }
 
     private void initList(View view) {
@@ -148,6 +169,7 @@ public class ChoosingCityFragment extends Fragment {
             @Override
             public void onCityTextClick(View view, int position) {
                 currentParcel = new Parcel(cities.get(position), position, cities);
+                saveInstance(enterCity, checkBoxHumidity, checkBoxPressure, checkBoxWindSpeed);
                 showWeather(currentParcel);
             }
         });
@@ -170,9 +192,20 @@ public class ChoosingCityFragment extends Fragment {
         }
     }
 
-    private void showExtras() {
-        saveInstance(enterCity, checkBoxHumidity, checkBoxPressure, checkBoxWindSpeed);
-        ShowWeatherFragment.showExtras();
+    private void showExtras(CompoundButton compoundButton, boolean b) {
+        if (isLandscape) {
+            saveInstance(enterCity, checkBoxHumidity, checkBoxPressure, checkBoxWindSpeed);
+            ShowWeatherFragment.showExtras();
+        }
+        View view = getActivity().findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(view.getRootView(), compoundButton.getText() + " checked", Snackbar.LENGTH_LONG);
+        snackbar.show();
+        snackbar.setAction("Back", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                compoundButton.setChecked(!b);
+            }
+        });
     }
 
     private void saveInstance(EditText enterCity, CheckBox checkBoxHumidity, CheckBox checkBoxPressure, CheckBox checkBoxWindSpeed) {
@@ -187,5 +220,25 @@ public class ChoosingCityFragment extends Fragment {
         checkBoxHumidity.setChecked(presenter.getIsCheckBoxHumidity());
         checkBoxPressure.setChecked(presenter.getIsCheckBoxPressure());
         checkBoxWindSpeed.setChecked(presenter.getIsCheckBoxWindSpeed());
+    }
+
+    private boolean checkEnterCity(TextView textView, String text) {
+        if (checkCity.matcher(text).matches()) {
+            textView.setError(null);
+            return true;
+        } else {
+            textView.setError("Wrong city name");
+            return false;
+        }
+    }
+
+    public void changeTheme(){
+        if(presenter.getIsDarkTheme()){
+            ((AppCompatActivity)getActivity()).getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else {
+            ((AppCompatActivity)getActivity()).getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.detach(this).attach(this).commit();
     }
 }

@@ -6,12 +6,14 @@ public final class ChooseCityPresenter {
     private boolean isCheckBoxHumidity;
     private boolean isCheckBoxPressure;
     private boolean isCheckBoxWindSpeed;
+    private boolean isDarkTheme;
     private String enterCity;
 
     public ChooseCityPresenter() {
         isCheckBoxHumidity = false;
         isCheckBoxPressure = false;
         isCheckBoxWindSpeed = false;
+        isDarkTheme = false;
         enterCity = "";
     }
 
@@ -47,6 +49,14 @@ public final class ChooseCityPresenter {
         if (enterCity != null) {
             this.enterCity = enterCity;
         }
+    }
+
+    public boolean getIsDarkTheme() {
+        return isDarkTheme;
+    }
+
+    public void setDarkTheme(boolean darkTheme) {
+        isDarkTheme = darkTheme;
     }
 
     public static ChooseCityPresenter getInstance() {

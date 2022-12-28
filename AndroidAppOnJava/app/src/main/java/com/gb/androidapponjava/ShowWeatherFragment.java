@@ -12,7 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -110,6 +113,12 @@ public class ShowWeatherFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        changeTheme();
+    }
+
     public static void showExtras() {
         boolean isCheckedHumidity = presenter.getIsCheckBoxHumidity();
         boolean isCheckedPressure = presenter.getIsCheckBoxPressure();
@@ -129,5 +138,15 @@ public class ShowWeatherFragment extends Fragment {
         } else {
             windSpeedLinear.setVisibility(View.GONE);
         }
+    }
+
+    public void changeTheme() {
+        if (presenter.getIsDarkTheme()) {
+            ((AppCompatActivity) getActivity()).getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            ((AppCompatActivity) getActivity()).getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.detach(this).attach(this).commit();
     }
 }
