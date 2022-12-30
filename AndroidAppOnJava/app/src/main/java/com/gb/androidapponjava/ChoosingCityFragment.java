@@ -105,6 +105,7 @@ public class ChoosingCityFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String text = enterCity.getText().toString();
+                saveInstance(enterCity, checkBoxHumidity, checkBoxPressure, checkBoxWindSpeed);
                 if (checkEnterCity(enterCity, text)) {
                     if (!cities.contains(text)) {
                         cities.add(cities.size(), text);

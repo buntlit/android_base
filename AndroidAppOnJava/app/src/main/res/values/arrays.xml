@@ -2,7 +2,7 @@
 <resources>
     <string-array name="cities">
         <item>Moscow</item>
-        <item>Saint-Petersburg</item>
+        <item>Saint Petersburg</item>
         <item>Yekaterinburg</item>
         <item>Novosibirsk</item>
         <item>Samara</item>
@@ -11,15 +11,6 @@
     <string-array name="days">
         <item>Tomorrow:</item>
         <item>After Tomorrow:</item>
-    </string-array>
-
-    <string-array name="temperature">
-        <item>-5°</item>
-        <item>-10°</item>
-        <item>-12°</item>
-        <item>-24°</item>
-        <item>3°</item>
-        <item>0°</item>
     </string-array>
 
     <string-array name="temperatureTomorrow">
@@ -40,30 +31,4 @@
         <item>1°</item>
     </string-array>
 
-    <string-array name="humidity">
-        <item>80%</item>
-        <item>90%</item>
-        <item>40%</item>
-        <item>34%</item>
-        <item>69%</item>
-        <item>50%</item>
-    </string-array>
-
-    <string-array name="pressure">
-        <item>749</item>
-        <item>743</item>
-        <item>764</item>
-        <item>755</item>
-        <item>734</item>
-        <item>750</item>
-    </string-array>
-
-    <string-array name="windSpeed">
-        <item>6,4</item>
-        <item>2,6</item>
-        <item>3,3</item>
-        <item>4,9</item>
-        <item>5,5</item>
-        <item>5,0</item>
-    </string-array>
 </resources>

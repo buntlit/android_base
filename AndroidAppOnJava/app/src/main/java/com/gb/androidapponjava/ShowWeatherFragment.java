@@ -1,6 +1,8 @@
 package com.gb.androidapponjava;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,10 +21,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gb.androidapponjava.modules.WeatherFromApi;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class ShowWeatherFragment extends Fragment {
     public static final String PARCEL = "PARCEL";
@@ -71,11 +76,6 @@ public class ShowWeatherFragment extends Fragment {
         pressureLinear = view.findViewById(R.id.pressureLinear);
         windSpeedLinear = view.findViewById(R.id.windSpeedLinear);
 
-        String[] temperaturesArray = getResources().getStringArray(R.array.temperature);
-        String[] humidityArray = getResources().getStringArray(R.array.humidity);
-        String[] pressureArray = getResources().getStringArray(R.array.pressure);
-        String[] windSpeedArray = getResources().getStringArray(R.array.windSpeed);
-
         Parcel parcel = getParcel();
         int index;
         if (parcel.getCityIndex() > getResources().getStringArray(R.array.cities).length) {
@@ -84,18 +84,25 @@ public class ShowWeatherFragment extends Fragment {
             index = parcel.getCityIndex();
         }
         city.setText(parcel.getCityName());
+        String cityName;
+        if (Locale.getDefault().getLanguage().equals("ru") && parcel.getCityIndex() < getResources().getStringArray(R.array.cities).length) {
+            setLocale("en");
+            cityName = getResources().getStringArray(R.array.cities)[index];
+            setLocale("ru");
+        } else {
+            cityName = parcel.getCityName();
+        }
+        WeatherFromApi weatherFromApi = new WeatherFromApi(cityName);
+
+        weatherFromApi.getWeather(temperatureValue, humidityValue, pressureValue, windSpeedValue);
 
         final RecyclerView recyclerView = view.findViewById(R.id.recyclerViewForecast);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ForecastAdapter forecastAdapter = new ForecastAdapter(Arrays.asList(getResources().getStringArray(R.array.days)), index, getContext());
         recyclerView.setAdapter(forecastAdapter);
 
-        temperatureValue.setText(temperaturesArray[index]);
-        humidityValue.setText(humidityArray[index]);
-        pressureValue.setText(pressureArray[index]);
-        windSpeedValue.setText(windSpeedArray[index]);
-
         showExtras();
+
         Button settingsButton = view.findViewById(R.id.buttonSettings);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +145,14 @@ public class ShowWeatherFragment extends Fragment {
         } else {
             windSpeedLinear.setVisibility(View.GONE);
         }
+    }
+
+    private void setLocale(String region) {
+        Locale locale = new Locale(region);
+        Resources resources = getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.locale = locale;
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
     }
 
     public void changeTheme() {
